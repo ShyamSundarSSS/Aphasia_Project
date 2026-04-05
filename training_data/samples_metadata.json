@@ -1,0 +1,58 @@
+[
+  {
+    "timestamp": "20260208_204741",
+    "filename": "sample_20260208_204741.wav",
+    "filepath": "training_data\\sample_20260208_204741.wav",
+    "scenario": "Your Childhood Home",
+    "duration": 30.0,
+    "severity_label": "Mild Aphasia",
+    "severity_level": 1,
+    "aphasia_type": "None",
+    "transcript": "My name is Vesua and I'm a book programmer who is working in Logitech, currently. And I've developed many book projects that actually make impact on the Cleanseid user base in order to develop a book.",
+    "word_count": 38,
+    "features": {
+      "temporal": {
+        "num_segments": 27,
+        "avg_segment_duration": 0.7075555555555556,
+        "avg_pause_duration": 0.32123076923076926,
+        "speech_rate": 0.9,
+        "pause_ratio": 0.3631999999999997,
+        "max_pause": 2.112,
+        "segment_variability": 0.3851177148885619,
+        "speaking_time": 19.10400000000001,
+        "total_time": 30.0
+      },
+      "linguistic": {
+        "word_count": 38,
+        "unique_word_ratio": 0.8157894736842105,
+        "avg_word_length": 4.2105263157894735,
+        "filler_word_ratio": 0.0,
+        "repetition_ratio": 0.18421052631578946,
+        "immediate_repetition_ratio": 0.0,
+        "sentence_count": 2,
+        "has_meaning": 0.8087719298245614,
+        "content_word_ratio": 0.7105263157894737,
+        "semantic_coherence": 1.0,
+        "content_word_count": 27
+      },
+      "grammar": {
+        "grammar_errors": 0,
+        "errors_per_word": 0.0,
+        "has_complete_sentences": true,
+        "missing_function_words": 0.010526315789473661,
+        "function_word_ratio": 0.2894736842105263,
+        "complete_sentence_ratio": 0.6666666666666666,
+        "error_types": []
+      },
+      "prosodic": [
+        325.3779602050781,
+        465.55859375,
+        0.020883185788989067,
+        0.01794262044131756,
+        110.29411764705883,
+        0.0914559110141258,
+        0.07941676338485044
+      ]
+    }
+  }
+]

@@ -1,0 +1,90 @@
+=================================================================
+APHASIA AUDIO SAMPLE GENERATION GUIDE
+=================================================================
+
+PROBLEM: pyttsx3 cannot directly save to audio files on all systems.
+
+SOLUTION: Use the working sample_generator.py to play audio through
+speakers, and record it with the training GUI.
+
+=================================================================
+METHOD 1: MANUAL GENERATION (Recommended)
+=================================================================
+
+1. Open TWO terminal windows:
+   
+   Terminal 1:
+   > python sample_generator.py
+   
+   Terminal 2:
+   > python gui_trainer.py
+
+2. In sample_generator.py:
+   - Click "Load Sample Library"
+   - Enable "Aphasia Simulation"
+   - Select simulation type
+   - Select a sample
+
+3. In gui_trainer.py:
+   - Select correct severity level
+   - Select aphasia type
+   - Click "Start Recording"
+
+4. In sample_generator.py:
+   - Click "Speak Current" immediately
+   - Sample will be recorded and saved!
+
+5. Repeat for multiple samples
+
+=================================================================
+METHOD 2: BATCH GENERATION (Automated)
+=================================================================
+
+1. Run batch generator:
+   > python batch_audio_generator.py
+
+2. Select aphasia type and number of samples
+
+3. Keep training GUI open and ready
+
+4. Click "Start Generating"
+
+5. For EACH sample:
+   - Countdown will show (3...2...1...)
+   - Quickly click "Start Recording" in training GUI
+   - Audio will play through speakers
+   - Training GUI records it
+   - Delay before next sample
+
+=================================================================
+METHOD 3: SYSTEM AUDIO RECORDING
+=================================================================
+
+Windows:
+1. Open "Sound Settings" → "Sound Control Panel"
+2. Go to "Recording" tab
+3. Enable "Stereo Mix" or "Wave Out Mix"
+4. Set as default recording device
+5. Use sample_generator.py to play audio
+6. Record with any audio recorder (Audacity, etc.)
+
+=================================================================
+TROUBLESHOOTING
+=================================================================
+
+Q: Audio quality is poor
+A: Increase volume, use better speakers, reduce background noise
+
+Q: Can't hear the audio
+A: Check volume settings, verify TTS engine is working
+
+Q: Recording captures nothing
+A: Enable "Stereo Mix" in Windows sound settings
+
+Q: Want higher quality samples
+A: Use external recording software (Audacity) with Stereo Mix
+
+=================================================================
+
+For best results, use METHOD 1 (Manual) as it gives you full
+control over each sample and ensures high quality recordings.

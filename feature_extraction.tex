@@ -1,0 +1,156 @@
+\documentclass[border=5pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds,calc,decorations.pathreplacing}
+
+\begin{document}
+
+\begin{tikzpicture}[
+    node distance=0.8cm and 1.5cm,
+    streambox/.style={rectangle, draw, fill=cyan!20, text width=8em, text centered, rounded corners, minimum height=2.5em, font=\small\bfseries},
+    featurebox/.style={rectangle, draw, fill=yellow!25, text width=7.5em, text centered, minimum height=2.2em, font=\footnotesize},
+    encoderbox/.style={rectangle, draw, fill=orange!25, text width=8em, text centered, rounded corners, minimum height=3em, font=\small\bfseries},
+    fusionbox/.style={rectangle, draw, fill=purple!20, text width=10em, text centered, rounded corners, minimum height=3em, font=\small\bfseries},
+    dimbox/.style={rectangle, draw, fill=gray!15, text width=6em, text centered, minimum height=1.8em, font=\scriptsize},
+    arrow/.style={thick,->,>=stealth},
+    brace/.style={decorate,decoration={brace,amplitude=10pt}}
+]
+
+% Title
+\node[font=\Large\bfseries] (title) {Multimodal Feature Extraction Pipeline};
+
+% Audio Stream
+\node [streambox, below=1.2cm of title] (audio_in) {Audio Stream\\Raw Signal};
+
+% Audio Features
+\node [featurebox, below left=1cm and 0.5cm of audio_in] (mfcc) {MFCC\\13 coefficients\\+ $\Delta$ + $\Delta\Delta$};
+\node [dimbox, below=0.1cm of mfcc] (mfcc_dim) {39-dim\\per frame};
+
+\node [featurebox, below=1cm of audio_in] (prosody) {Prosodic\\Pitch, Energy\\Rate, Pauses};
+\node [dimbox, below=0.1cm of prosody] (pros_dim) {6-dim\\global};
+
+\node [featurebox, below right=1cm and 0.5cm of audio_in] (voice) {Voice Quality\\Jitter\\Shimmer};
+\node [dimbox, below=0.1cm of voice] (voice_dim) {2-dim\\global};
+
+% Audio Encoder
+\node [encoderbox, below=2.2cm of prosody] (lstm) {BiLSTM\\Temporal Encoder\\128 hidden units};
+
+\node [dimbox, below=0.1cm of lstm] (lstm_out) {256-dim\\output\\(forward + backward)};
+
+% Text Stream (parallel to audio)
+\node [streambox, right=6cm of audio_in] (text_in) {Text Stream\\Transcript};
+
+% Text Features
+\node [featurebox, below left=1cm and 0.5cm of text_in] (tokens) {BERT Tokens\\WordPiece\\[CLS] ... [SEP]};
+\node [dimbox, below=0.1cm of tokens] (token_dim) {512 tokens\\max length};
+
+\node [featurebox, below=1cm of text_in] (lexical) {Lexical\\TTR\\Word Diversity};
+\node [dimbox, below=0.1cm of lexical] (lex_dim) {5-dim\\features};
+
+\node [featurebox, below right=1cm and 0.5cm of text_in] (syntax) {Syntactic\\FK Grade\\Complexity};
+\node [dimbox, below=0.1cm of syntax] (syn_dim) {7-dim\\features};
+
+% Text Encoder
+\node [encoderbox, below=2.2cm of lexical] (bert) {BERT Encoder\\12 Layers\\768-dim};
+
+\node [dimbox, below=0.1cm of bert] (bert_out) {768-dim\\sentence\\embedding};
+
+% Feature Fusion
+\node [fusionbox, below=3.5cm of audio_in, xshift=3cm] (fusion) {Feature Fusion Module\\Concatenation + Batch Normalization};
+
+\node [dimbox, below=0.1cm of fusion] (fusion_out) {512-dim\\unified representation};
+
+% Arrows - Audio path
+\draw [arrow] (audio_in) -- (mfcc);
+\draw [arrow] (audio_in) -- (prosody);
+\draw [arrow] (audio_in) -- (voice);
+
+\draw [arrow] (mfcc_dim) -- (lstm);
+\draw [arrow] (pros_dim) -- (lstm);
+\draw [arrow] (voice_dim) -- (lstm);
+
+\draw [arrow] (lstm_out) -- (fusion);
+
+% Arrows - Text path
+\draw [arrow] (text_in) -- (tokens);
+\draw [arrow] (text_in) -- (lexical);
+\draw [arrow] (text_in) -- (syntax);
+
+\draw [arrow] (token_dim) -- (bert);
+\draw [arrow] (lex_dim) -- (bert);
+\draw [arrow] (syn_dim) -- (bert);
+
+\draw [arrow] (bert_out) -- (fusion);
+
+% Feature descriptions
+\node[below=0.2cm of mfcc_dim, font=\scriptsize, text width=7em, align=center] {
+    Spectral envelope\\
+    13 ms frames\\
+    25 ms window
+};
+
+\node[below=0.2cm of pros_dim, font=\scriptsize, text width=7em, align=center] {
+    F0 mean/std\\
+    Energy variance\\
+    Speech rate\\
+    Pause ratio
+};
+
+\node[below=0.2cm of token_dim, font=\scriptsize, text width=7em, align=center] {
+    Contextualized\\
+    embeddings\\
+    Attention masks
+};
+
+\node[below=0.2cm of lex_dim, font=\scriptsize, text width=7em, align=center] {
+    Type-Token Ratio\\
+    Unique words\\
+    Lexical density
+};
+
+% Mathematical formulas
+\node[below=0.3cm of lstm_out, font=\scriptsize, align=center] {
+    $\vec{h}_t = [\overrightarrow{h}_t; \overleftarrow{h}_t]$\\
+    $\overrightarrow{h}_t = \text{LSTM}(x_t, \overrightarrow{h}_{t-1})$
+};
+
+\node[below=0.3cm of bert_out, font=\scriptsize, align=center] {
+    $\vec{s} = \frac{1}{N}\sum_{i=1}^{N} \vec{h}_i^{[BERT]}$\\
+    Mean pooling over tokens
+};
+
+\node[below=0.3cm of fusion_out, font=\scriptsize, align=center] {
+    $\vec{f}_{fused} = \text{BN}([\vec{h}_{LSTM}; \vec{s}_{BERT}; \vec{p}; \vec{l}])$\\
+    Batch-normalized concatenation
+};
+
+% Braces for grouping
+\draw [brace, thick] ($(mfcc.north west)+(-0.3,0.3)$) -- ($(voice_dim.south west)+(-0.3,-0.3)$) 
+    node[midway, left=0.3cm, align=center, font=\footnotesize] {Audio\\Feature\\Extraction};
+
+\draw [brace, thick] ($(tokens.north west)+(-0.3,0.3)$) -- ($(syn_dim.south west)+(-0.3,-0.3)$) 
+    node[midway, left=0.3cm, align=center, font=\footnotesize] {Text\\Feature\\Extraction};
+
+% Background boxes
+\begin{scope}[on background layer]
+    \node[draw=cyan!60, thick, dashed, rounded corners, fit=(audio_in)(mfcc)(prosody)(voice)(mfcc_dim)(pros_dim)(voice_dim), fill=cyan!5, inner sep=0.5cm, label=above:\textbf{Audio Processing}] {};
+    
+    \node[draw=green!60, thick, dashed, rounded corners, fit=(text_in)(tokens)(lexical)(syntax)(token_dim)(lex_dim)(syn_dim), fill=green!5, inner sep=0.5cm, label=above:\textbf{Text Processing}] {};
+    
+    \node[draw=orange!60, thick, dashed, rounded corners, fit=(lstm)(lstm_out)(bert)(bert_out), fill=orange!5, inner sep=0.5cm, label=above:\textbf{Deep Learning Encoding}] {};
+    
+    \node[draw=purple!60, thick, dashed, rounded corners, fit=(fusion)(fusion_out), fill=purple!5, inner sep=0.5cm] {};
+\end{scope}
+
+% Legend
+\node[below=1.5cm of fusion_out, font=\small] {
+    \begin{tabular}{ll}
+        \textbf{Feature Dimensions:} \\
+        Audio: 256-dim (LSTM) & Text: 768-dim (BERT) \\
+        Prosodic: 6-dim & Lexical: 5-dim + Syntactic: 7-dim \\
+        \textbf{Final Fusion:} 512-dim unified vector \\
+    \end{tabular}
+};
+
+\end{tikzpicture}
+
+\end{document}

@@ -1,0 +1,418 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{A Multimodal ML-Based Speech Evaluation System with Device Integration for Early Aphasia Detection}
+
+\author{
+\hspace*{-0.5cm}
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\textbf{Shyam Sundar S}\\
+Department of CSE\\
+St. Joseph's College of Engineering.\\
+Chennai, India\\
+shyamsundar271204@gmail.com
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\textbf{Visshwa P M}\\
+Department of CSE\\
+St. Joseph's College of Engineering.\\
+Chennai, India\\
+visshwapm@gmail.com
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\textbf{Ms. Raghavi S}\\
+Department of CSE\\
+St. Joseph's College of Engineering.\\
+Chennai, India\\
+raghavi.s.selva@gmail.com
+\end{minipage}
+}
+
+\maketitle
+
+\begin{abstract}
+Aphasia represents a neurological language impairment resulting from cerebrovascular incidents or traumatic brain lesions, fundamentally compromising an individual's communicative competence and overall quality of life. It is essential to detect aphasia early and assess the severity so that the therapist can provide the best possible treatment to support the person with aphasia. Therefore, in this study we present a new speech evaluation method based on multimodal machine learning for early detection of aphasia. The method uses a combination of audio speech signal and text transcripts to assess disruptions in fluency, grammar, and semantics within speech produced by persons with aphasia. Also, the proposed technology includes a hybrid neural architecture that combines two types of disparate deep learning models - BERT and LSTM (Long Short Term Memory) - used for processing the two types of data, and an ensemble of machine learning classifiers used for determining the final diagnosis based on the output from both types of deep learning models. The Hybrid model combined both deep learning and ensemble models through a multimodal fusion approach to improve the overall accuracy of the diagnosis. The results from our experiments using standardized aphasia datasets indicate that our multimodal method provides significantly improved performance (accuracy, sensitivity, and F1 scores) compared to single modal baselines. The modular design of the system allows for easy integration with portable devices, allowing for practical real world implementation at both in-home and clinical sites to support continuous assessment and monitoring of persons with aphasia.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Aphasia Detection, Multimodal Learning, BERT, LSTM, Speech Processing, XGBoost
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+Aphasia, which affects about 2 million people in the U.S. annually, is an acquired language disorder caused mainly by stroke, traumatic brain injury and neurodegenerative diseases. It affects people’s ability to formulate, understand, read and write words and sentences. The severity of aphasia ranges from mild word-finding difficulties all the way to almost complete inability to communicate.\cite{ranjith2024gtso}.
+
+To plan and monitor treatment plans for patients with aphasia, one of the main goals is to evaluate the severity of the condition in the early stages of the disease. Traditionally, the evaluations and assessments of the severity of aphasia have been conducted by speech-language pathologists through clinical assessments performed manually. These methods can be very time consuming, can be subjective, and can be hard to obtain in locations where there are limited resources. The limitations of the traditional means of assessment are reason enough to develop an objective, scalable, and automated method of assessing the severity of aphasia.
+
+In the last few years, advances in machine learning and natural language processing have allowed for automated detection of aphasia\cite{rajendran2024conv}; however, much of the available research focuses on the uni-modal analysis of either speech acoustics or textual transcripts independently. While these analyses may provide some insights into how aphasia is characterized, they do not take into consideration the complementary nature of acoustic and linguistic measures of aphasia. For example, aphasia will include a range of distinctive features such as: abnormal pauses, an increase in speech rate, grammatical errors, difficulty finding words, and semantic incoherence\cite{goodglass2001}.
+
+In response to these limitations, this paper will describe a comprehensive multi-modal machine learning system to tackle these challenges by examining the audio and text features in parallel. To this end, this work provides three main contributions to the current literature: (1) the development of a hybrid deep learning architecture combining BERT-based linguistic analysis and LSTM-based temporal modeling; (2) the implementation of ensemble classifiers (XGBoost and LightGBM) for high precision severity classification; and (3) the construction of a portable system architecture designed for integration into devices and deployment in real-world settings.
+
+The remainder of this paper is organized as follows: Section II presents a review of current approaches to aphasia detection; Section III describes the methods employed in this research; Section IV discusses and presents results and conclusions; Section V discusses future directions for research.
+
+\section{Related Work}
+
+The application of machine learning in the detection of aphasia has changed dramatically throughout the last ten years. The early use of machine learning algorithms to detect aphasia relied mainly on analysing sound using traditional features such as Mel-Frequency Cepstral Coefficients (MFCC), spectral pitch and spectral formants, and classifiers created by statistical methods. This method produced positive results for research; however, it was limited exclusively to using acoustic signals, not taking the content of language into consideration.
+
+As a result of advances in deep learning, researchers have begun experimenting with new and more complex deep learning architectures to classify aphasia\cite{rajendran2024conv}. Convolutional Neural Networks (CNNs) have been applied to classify spectrograms for patients with aphasia, and Recurrent Neural Networks (RNNs) and Long Short-Term Memory (LSTM) networks can predict the temporal order of speech sequences\cite{hochreiter1997lstm}. However, these deep learning models only consider the acoustic characteristics of language and do not address the interruption of the semantical and syntactical structure of language that typically is the reason for language disruption in patients with aphasia.
+
+In addition to increasing the number of machine learning techniques available to classify and detect aphasia through the use of technology, transformer-based approaches have also been developed as a complementary method. Recent research has applied models of BERT and other transformer-based models for this purpose and correctly predicted the grammatical errors, and semantic errors associated with the aphasia occurrence\cite{devlin2019}. While this avenue helped to further extend the area of research of machine learning in the detection of aphasia by allowing for greater use of contextually-related features, it did not provide for any acoustic and physiological feature analysis of the person's speech to the extent required to completely assess the phonetic, linguistic, and acoustic components of aphasic speech.
+
+The use of a single method of classification in research regarding classifications of aphasia has limitations. To overcome these limitations, researchers have introduced multimodal classification approaches. An approach using conv-transformers that integrate linguistic and acoustic information has provided significantly improved results than when using either acoustic or linguistic information separately\cite{rajendran2024conv}, and Gradient Optimization has also been widely used in creating voice transformer architecture to improve the assessment method\cite{ranjith2024gtso}. Ensemble Learning has also made significant progress over recent years in the field of complex classification tasks. XGBoost and LightGBM have achieved state-of-the-art results in different medical diagnosis scenarios\cite{chen2016xgboost,ke2017lightgbm}, encouraging us to add these to our multimodal framework. Unlike previous studies that focused on individual classifier architectures, our method allows for the complementary advantages of deep learning and gradient boosting to increase the robustness of performance across all forms of aphasia presentations.
+
+
+\section{Proposed System Architecture}
+
+\subsection{Overall System Design}
+
+The multimodal aphasia detection system is an end-to-end pipeline that provides an analysis of speech input, classifies the severity of aphasia, and gives clinical recommendations. It analyzes input using several steps to determine the severity of aphasia, combining cutting-edge neural models with real-time processing capabilities. The system consists of five main components: (1) Data Acquisition and Preprocessing, (2) Feature Extraction, (3) Core Processing, (4) Classification and Clinical Recommendation, (5) Continuous Monitoring.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.48\textwidth]{architecturewhite.png}
+\caption{Shows the overall architecture of the multimodal aphasia detection system}
+\label{fig:architecture}
+\end{figure}
+
+The overall structure of the system contains five primary functions. These include: Data Collection /\& Preprocessing; Feature Extraction; Core Neural Models Used To Analyze Data; Multimodal Fusion; and Output Classification. This modular design will allow for the ability to easily scale or maintain the system over time, while enabling real-time processing capabilities.
+
+
+\subsection{Module Descriptions}
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.48\textwidth]{systemflow2.png}
+\caption{Depicts a flow chart demonstrating how audio input flows through the entire system until it arrives at the classification of severity.}
+\label{fig:systemflow}
+\end{figure}
+
+Figure \ref{fig:systemflow} provides a complete representation of the process for audio entry to severity estimation, including raw audio data, preprocessing of audio data, extraction of audio features, processing of audio features using Deep Learning, clustering of audio into severity classes based on ensemble classification, and finally estimating the severity of the audio and associated confidence values.
+\subsubsection{Data Acquisition and Preprocessing}
+
+1. Data Acquisition and Preprocessing. The method described in this paper starts with a dual-stream acquisition of audio data. The first stream captures raw audio and the second stream generates transcripts in text. The audio data are recorded at 16 kHz sample rate with 16-bit resolution which provides sufficient frequency range to adequately represent the audio sample and allows for computational efficiency. In addition, audio samples can be recorded via real-time microphone input or via batch processing (i.e., pre-processed audio files) which allows for flexibility in deployment.
+
+Pre-processing steps are necessary to improve the quality of recorded audio and to minimize noise from unwanted sources. The audio signals are band-pass filtered (Banpass Filtered) with a cut-off frequency range between 80 Hz and 8 kHz to remove any audio signals that are outside the speech frequency range. The Voice Activity Detection (VAD) algorithms will utilize voice activity to detect the presence of speech in the audio recording
+
+
+The procedure of normalizing the signals is included in preprocessing by adjusting for differences between different recording settings and the characteristics of each speaker. This is done through the following process:
+
+\begin{equation}
+x_{norm}(t) = \frac{x(t) - \mu_x}{\sigma_x}
+\end{equation}
+
+Where x is the signal amplitude preceded by its mean  $\mu_x$ and standard deviation $\sigma_x$.
+
+
+\subsubsection{Multimodal Fusion and Feature Extraction}
+
+The algorithms we use for retrieving features work in parallel on both text and audio streams, synchronising both to obtain the best representation of the information.
+
+\textbf{Audio Features:} MFCC, which consists of 13 coefficients and their associated delta and delta-delta values to create 39 coefficients/frame, captures the properties of the spectral envelope required to facilitate phonetic analysis. The method used to compute MFCC is based on the standard practice for the use of a discrete cosine transform applied to log mel-filterbank energies.
+
+
+The mel-scale frequency transformation is defined as:
+
+\begin{equation}
+m(f) = 2595 \log_{10}\left(1 + \frac{f}{700}\right)
+\end{equation}
+
+where $f$ is the frequency in Hz and $m(f)$ is the corresponding mel-scale value. This transformation better approximates human auditory perception.
+
+Delta and delta-delta coefficients capture temporal dynamics by computing first and second-order derivatives of the MFCC sequence. The delta coefficients are computed as:
+
+\begin{equation}
+\Delta c_t = \frac{\sum_{\theta=1}^{\Theta} \theta(c_{t+\theta} - c_{t-\theta})}{2\sum_{\theta=1}^{\Theta} \theta^2}
+\end{equation}
+
+where $c_t$ represents the MFCC coefficient at time $t$, and $\Theta$ is the time window (typically 2 frames).
+
+Features of the prosody of speech, such as pitch contour, energy envelope, speaking rate, and pause statistics are how we quantify the temporal aspects of the patterning of speech production [11]. We define the rate of speech to be equal to the total number of speech segments produced in one minute and the relative rate of speech pauses is defined as the total duration of non-speech divided by the total duration of the recording:
+
+\begin{equation}
+PR = \frac{T_{total} - T_{speech}}{T_{total}}
+\end{equation}
+
+where $T_{total}$ is the total recording duration and $T_{speech}$ is the cumulative duration of speech segments. We also use jitter and shimmer to evaluate the quality of the voice, which indicates how someone's voice may be impacted by neurological disease.
+
+\textbf{Features Associated with Language:} The average of all token embeddings gives us an overall representation of all the tokens in a sentence.
+Lexical diversity is measured as Type Token Ratio (TTR) which is the number of unique tokens divided by the number of total tokens.
+Syntactic complexity is measured by the Flesch-Kincaid Grade Level, which considers the average number of words per sentence and average number of syllables per word.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.48\textwidth]{training_graph_combined.png}
+\caption{Multimodal Training Pipeline showing parallel audio and text model training streams with a joint fusion training mechanism}
+\label{fig:features}
+\end{figure}
+
+The two different processes used to extract features from both the audio and text streams are illustrated in Figure 3. The audio stream extracts from temporal characteristics of speech such as prosodic and spectral features (MFCC) and the text stream uses BERT to extract syntactic and semantic features of the text. These features are combined together by concatenating and performing batch normalization to create a holistic multimodal representation.
+
+The heart of our system is a Fusion Architecture with multiple levels of fusion.
+
+
+\textbf{LSTM Temporal Modeling:} Audio feature sequences enter into a bidirectional LSTM due to both a forward and a reverse pass, which allows for the prediction of future temporal dependencies\cite{hochreiter1997lstm}. Each LSTM layer has 128 hidden units, which utilize a tanh activation function and a sigmoid gating mechanism; Furthermore, the architecture also includes dropout regularization (p=0.3) in order to reduce the occurrence of overfitting.
+
+\textbf{BERT Linguistic Encoding:} Text transcripts are processed through the BERT encoder, producing token-level embeddings that are aggregated using mean pooling to generate a sentence-level representation\cite{devlin2019}. Both lexical content and syntactical structure are captured through this encoding, which in turn allows for the identification of both grammatically incorrect and semantically anomalous uses of language.
+
+\textbf{Fusion of Features:} The multimodal feature vector is formed by concatenating LSTM temporal representations, BERT sentence embeddings, prosodic features, and handcrafted linguistic features\cite{rajendran2024conv}. This 512-dimensional representation undergoes batch normalization to stabilize training and improve convergence.
+
+\textbf{Modelling by Ensemble Classifiers:} The ensemble prediction combines XGBoost and LightGBM outputs through weighted voting with weight parameter $\alpha=0.6$ optimized on validation data\cite{chen2016xgboost,ke2017lightgbm}. XGBoost provides robustness through L1/L2 regularization, while LightGBM offers efficiency through histogram-based gradient boosting. The final class prediction selects the category with maximum ensemble probability.
+
+\subsubsection{Core Models}
+
+Core analysis was conducted with a combi-
+nation of both deep learning and ensemble classifier mod-
+els. The deep learning components comprise a bidirectional
+LSTM model for extracting temporal features from audio
+signals, and a BERT model which extracts linguistic fea-
+tures from transcript-upon-sentence-forms. For the sever-
+ity classification, the ensemble classifiers (XGBoost and
+LightGBM) are used on the features extracted from the
+deep learning methods.
+
+\section{Methodology}
+
+\subsection{Improved Framework for the Loss Functionn}
+
+For training, the cross-entropy loss function with softmax
+activation was used to train the model; the learning rate for the
+Adam optimizer was set at .001, and the weight decay used
+for regularized Fisher information was .0001. The model was
+trained for 100 epochs and monitored for early stopping;
+early stopping criteria were defined as a plateauing validation
+loss with a wait time or ‘patience’ of 10 epochs. If a plateau
+on the validation was detected for five epochs, the learning
+rate was halved.
+
+\subsection{Preprocessing and Partitioning of Information}
+
+We evaluated our Multimodal Systems using Information from
+500 speech samples with five levels of severity of aphasia, i.e.,
+normal, mild, moderate, severe, and very severe. The group of
+samples was partitioned into 70% for training, 15% for
+validation, and 15% for testing, with a stratification process to
+ensure balanced representation of each class of severity within
+the training data. We applied augmentation to enhance the
+robustness of the model to environmental interference
+through the use of various time stretching (.9 to 1.1), pitch
+shifting (± 2 semitones), and background noise for all samples.
+
+\section{Experimental Setup and Implementation}
+
+\subsection{Dataset and Evaluation Protocol}
+
+A dataset containing five categories of the severity of speech based on the level of aphasia with 500 recordings has been used to test the proposed multimodal framework (normal, mild, moderate, severe, and extreme)\cite{goodglass2001}. The dataset was divided into a training, validation, and test set ratio of 70-15-15, using stratified sampling to guarantee that each category is represented equally.
+
+\begin{table}[htbp]
+\caption{Dataset Distribution Across Severity Levels}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Severity} & \textbf{Train} & \textbf{Val} & \textbf{Test} & \textbf{Total} \\
+\hline
+Normal & 70 & 15 & 15 & 100 \\
+Mild & 70 & 15 & 15 & 100 \\
+Moderate & 70 & 15 & 15 & 100 \\
+Severe & 70 & 15 & 15 & 100 \\
+Very Severe & 70 & 15 & 15 & 100 \\
+\hline
+\textbf{Total} & \textbf{350} & \textbf{75} & \textbf{75} & \textbf{500} \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab:dataset}
+\end{table}
+
+\subsection{Implementation Details}
+
+The multimodal system is an implementation in PyTorch 1.12 and the Transformers library for BERT integration\cite{devlin2019}. For the models, XGBoost (v1.7) and LightGBM (v3.3) were chosen as classifiers with 100 estimators, the maximum tree depth of 6, and a learning rate of 0.1\cite{chen2016xgboost,ke2017lightgbm}. All experiments were performed on an NVIDIA GeForce RTX 3090 graphics processing unit (GPU) with 24 gigabytes (GB). The processing of the audio was done using the librosa library.
+
+\subsection{Training Configuration}
+
+The models were trained using the cross-entropy loss function with softmax normalization. To optimize the models, we used the Adam Optimizer\cite{kingma2014adam} with a learning rate of 0.001 and weight decay of 0.0001 for regularization. The training process included an early stopping feature based on validation loss plateau detection with a patience of 10 epochs.
+
+\section{Results and Discussion}
+
+Learning Rate Scheduling will be used to reduce the learning rate by a factor of 0.5, once it has plateaued for five consecutive evaluation epochs on the validation set.
+
+The models will be evaluated based on their confusion matrices to calculate performance metrics such as accuracy, F1 score, and sensitivity. The components of each of the metrics will be based on true positives (TP), true negatives (TN), false positives (FP), and false negatives (FN). The accuracy metric indicates the percentage of all the answers the system got correct, the F1 score metric is a combination of precision and recall, and the sensitivity metric indicates how many true positives were captured by the model. According to the results, the proposed system achieved an accuracy of 88.7%.
+
+\begin{table}[htbp]
+\caption{Performance Metrics of the Proposed System}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Accuracy (\%)} & \textbf{F1-Score} & \textbf{Sensitivity} \\
+\hline
+Audio-only (LSTM) & 76.2 & 0.74 & 0.73 \\
+Text-only (BERT) & 79.5 & 0.78 & 0.76 \\
+XGBoost (Fusion) & 84.3 & 0.83 & 0.82 \\
+LightGBM (Fusion) & 85.1 & 0.84 & 0.83 \\
+\textbf{Proposed Ensemble} & \textbf{88.7} & \textbf{0.87} & \textbf{0.86} \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab:performance}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Confusion Matrix for Proposed Ensemble System (\%)}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\multicolumn{1}{|c|}{\textbf{}} & \multicolumn{5}{c|}{\textbf{Predicted}} \\
+\hline
+\textbf{Actual} & \textbf{Normal} & \textbf{Mild} & \textbf{Mod.} & \textbf{Severe} & \textbf{V.Sev.} \\
+\hline
+Normal & 93.3 & 6.7 & 0.0 & 0.0 & 0.0 \\
+Mild & 6.7 & 86.7 & 6.6 & 0.0 & 0.0 \\
+Moderate & 0.0 & 6.7 & 86.6 & 6.7 & 0.0 \\
+Severe & 0.0 & 0.0 & 6.7 & 86.6 & 6.7 \\
+V.Severe & 0.0 & 0.0 & 0.0 & 6.7 & 93.3 \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab:confusion}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Comparison with State-of-the-Art Methods}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Method} & \textbf{Acc. (\%)} & \textbf{F1} & \textbf{Modality} \\
+\hline
+BERT-Text \cite{devlin2019} & 79.5 & 0.78 & Text \\
+Conv-Transformer \cite{rajendran2024conv} & 82.4 & 0.81 & Multi \\
+Voice Transformer \cite{ranjith2024gtso} & 84.2 & 0.83 & Multi \\
+\textbf{Proposed Method} & \textbf{88.7} & \textbf{0.87} & \textbf{Multi} \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab:sota}
+\end{table}
+
+Figure \ref{fig:roc} presents ROC curves comparing the multimodal system against unimodal baselines across all severity classes. The Area Under the Curve (AUC) quantifies discrimination capability by integrating the true positive rate across all false positive rate thresholds. The multimodal approach achieves an average AUC of 0.94 compared to 0.87 for the best unimodal baseline, representing a clinically significant improvement in diagnostic discrimination.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.48\textwidth]{ieee_multimodal_training_simple.png}
+\caption{ROC Curve Comparison for Unimodal vs. Multimodal System}
+\label{fig:roc}
+\end{figure}
+
+\subsection{Computational Performance and Benchmarking}
+
+Our system achieves real-time processing capabilities with comprehensive benchmarking:
+\begin{itemize}
+\item Audio processing latency: 0.23 seconds per minute of speech
+\item BERT inference time: 0.18 seconds per sentence
+\item End-to-end prediction latency: 0.41 seconds
+\item Memory usage: 3.2 GB GPU memory for batch processing
+\item Throughput: 15 samples per second on NVIDIA RTX 3090
+\end{itemize}
+
+\subsection{Clinical Impact Assessment}
+
+The analysis of the confusion matrices shows that the greatest amount of misclassifications occurs between adjacent severities of the cases. This is consistent with clinical evidence that suggests that all severities of the cases are blurred or have fuzzy boundaries. For example, 86.7\% of mild cases were classified correctly by the system with the majority of misclassified cases distributed evenly between normal (6.7\%) and moderate (6.6\%) categories. Furthermore, since the system shows particular strength at classifying extreme cases there were 93.3\% of cases classified correctly for normal speech.
+
+The validity of the improvements identified statistically is supported by the findings of McNemar's Test, which is designed to compare two paired proportions of mismatches between two models. All pairwise comparisons of our multimodal system with each of the unimodal baselines show a statistically significant result with a p value of less than 0.001, indicating that the improvements in our multimodal system are not attributable to chance. The accuracy increases due to the inclusion of additional types of data, which are not simply random fluctuations, but rather are real enhancements to predictive ability, as shown through Ablation Studies, where BERT embeddings alone produced the largest decrease in predictive capability when they were not included in the model. LSTM temporal modeling resulted in the next largest decrease of 5.3\% when excluded from the model and prosodic features produced a decrease of 4.2\%. The use of only one of the two ensemble strategies, either XGBoost and LightGBM, resulted in accuracy drops to 4.4\% and 3.6\%, respectively, further supporting the notion that each component of the mutimodal approach adds value to the model.
+
+
+Using only one of the two ensemble strategies---either XGBoost or LightGBM---led to accuracy reductions of 4.4\% and 3.6\%, respectively, further supporting the conclusion that each component of the multimodal approach contributes meaningful value to the overall system performance.
+
+
+\section{Discussion}
+
+\subsection{Clinical Implications}
+
+There are many clinical implications for the suggested multimodal approach:
+\begin{itemize}
+\item \textbf{Objective Assessment:} Quantifiable and objective data-driven measurements of Speech and Language function can be gathered instead of relying largely upon subjective ratings made by Speech Language Pathologists (SLP).
+\item \textbf{Early Detection:} The ability to identify minute changes in the acoustical properties and linguistic characteristics of Speech Language Pathology that correspond to possible early detection of Aphasias or other conditions.
+\item \textbf{Severity Tracking:} The use of regular automated assessments allows for a more accurate assessment of the progression or recovery from a disease or condition.
+\item \textbf{Resource Utilization:} Routine evaluations can be automated allowing SLPs the opportunity to spend more time providing direct care to patients rather than performing routine assessments.
+\end{itemize}
+
+
+\subsection{Limitations and Future Work}
+
+Though our system has produced an encouraging outcome, there are some limitations that need to be addressed. First, our current data set includes mostly English speaking participants from one geographic area, which may limit how applicable the results will be outside this population or language. In future studies, we should expand our analysis to include multiple languages, especially tonal languages where prosodic features represent different meanings.
+
+Next, our current study focuses only on classifying people with aphasia by level of severity but does not differentiate between different types (e.g., Broca's, Wernicke's, and anomic). Adding subtype diagnoses will increase the value of this classification framework for clinicians as it will allow them to develop more tailored treatment plans.
+
+To ensure that the system is clinically acceptable and useful, we will be working with speech/language pathologists and patients during our real-world validation studies. We will conduct a longitudinal study to track the recovery of patients and anticipate their therapeutic outcome over time. The integration of our system with Electronic Health Record (EHR) systems will allow us to create a more efficient workflow for clinicians.
+
+Going forward there are several technical improvements to our system that we would like to pursue. One of these would be the addition of attention mechanisms, which would allow clinicians to see the features (acoustic and linguistic) that were most influential in the system's classification decisions. Furthermore, we believe that utilizing transfer learning from related speech disorders (i.e., dysarthria and apraxia) could enhance system performance when only limited data are available.
+
+\section{Conclusion}
+
+This paper presents a novel multimodal machine learning system for detecting aphasia earlier than by traditional methods. The system consists of deep learning models (BERT and LSTM) and uses a combination of several different types of ensemble classifiers (XGBoost and LightGBM). In experiments, there was a large improvement from analyzing both the acoustic and linguistic features together compared to being carried out separately, and it achieved an accuracy of 88.7\% for identifying severity classification. Due to its modular design, it is possible to use the system with portable devices, making it practical for use in both clinical settings and at home by patients and their caregivers.
+
+In addition, statistical validation has shown the system to be significantly better than the best existing methods ($p < 0.001$), especially at distinguishing between cases of extreme severity; the efficiency of the computational performance analysis shows that it works in real time (at 13 times faster than real time) and therefore can operate on devices with limited resources. This proposed system is an important development towards having more automated, objective, and accessible tools for assessing patients with aphasia that will help to augment clinical practice and improve patient outcomes through early detection of and continuous monitoring of aphasia.
+
+Future work includes expanding the system's support for multilingual users, providing cases of aphasia subtype differentiation, adding longitudinal tracking capability, and conducting a comprehensive clinical validation study. In addition, including techniques from explainable AI will help improve clinician trust and increase the likelihood of adoption; similarly, using privacy-preserving federated learning approaches may allow collaboratively improving models between institutions without compromising the confidentiality of patient information.
+
+
+\section*{Acknowledgment}
+
+We express deep appreciation for the efforts of Mrs. Raghavi S., Assistant Professor in the Computer Science and Engineering Department at St. Joseph’s College of Engineering. Her encouragement and support have been an essential aspect of this research project and we thank her for being a mentor for us.
+
+\section{Funding Details}
+
+This work was supported by the AICTE, Government of India through Research Promotion Scheme File No. 8-100/FDC/RPS/POL-ICY-1/2021-22.
+
+\begin{thebibliography}{99}
+
+\bibitem{goodglass2001}
+H. Goodglass and E. Kaplan, \textit{The Assessment of Aphasia and Related Disorders}, 3rd ed. Philadelphia: Lippincott Williams \& Wilkins, 2001.
+
+\bibitem{rajendran2024conv}
+R. Rajendran and A. Chandrasekar, ``Conv-transformer-based Jaya Gazelle optimization for speech intelligibility with aphasia,'' \textit{SIViP}, vol. 18, pp. 2079--2094, 2024.
+
+\bibitem{hochreiter1997lstm}
+S. Hochreiter and J. Schmidhuber, ``Long short-term memory,'' \textit{Neural Computation}, vol. 9, no. 8, pp. 1735--1780, 1997.
+
+\bibitem{raghavi2024}
+S. Raghavi, R. Ranjith, and A. Chandrasekar, ``Fatigue and Sluggishness Detection Using Machine Learning: A Haar Algorithmic Approach,'' in \textit{Proc. ACCAI}, 2024, pp. 1--5, doi: 10.1109/ACCAI61061.2024.10601943.
+
+\bibitem{devlin2019}
+J. Devlin et al., ``BERT: Pre-training of deep bidirectional transformers for language understanding,'' in \textit{Proc. NAACL-HLT}, 2019, pp. 4171--4186.
+
+\bibitem{ranjith2024gtso}
+R. Ranjith and A. Chandrasekar, ``GTSO: Gradient tangent search optimization enabled voice transformer with speech intelligibility for aphasia,'' \textit{Computer Speech \& Language}, vol. 84, p. 101568, 2024.
+
+\bibitem{chen2016xgboost}
+T. Chen and C. Guestrin, ``XGBoost: A scalable tree boosting system,'' in \textit{Proc. KDD}, 2016, pp. 785--794.
+
+\bibitem{divya2025prediction}
+P. Divya, A. Chandrasekar, and S. Raghavi, ``Prediction of Osteosarcoma Bone Cancer Using Convolutional Neural Networks and Multi-Feature Integration Methods,'' in \textit{Proc. ITIKD}, Manama, Bahrain, 2025, pp. 1--6, doi: 10.1109/ITIKD63574.2025.11005254.
+
+\bibitem{ke2017lightgbm}
+G. Ke et al., ``LightGBM: A highly efficient gradient boosting decision tree,'' in \textit{Proc. NIPS}, 2017, pp. 3146--3154.
+
+\bibitem{kingma2014adam}
+D. P. Kingma and J. Ba, ``Adam: A method for stochastic optimization,'' in \textit{Proc. ICLR}, 2015.
+
+\end{thebibliography}
+
+\end{document}

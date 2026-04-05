@@ -1,0 +1,1 @@
+“Our system analyzes patient speech using both audio features and text transcripts. It uses machine learning models to detect patterns of aphasia by examining fluency, pronunciation, and grammar. By combining speech analysis and language understanding, the model accurately identifies whether a person has aphasia and helps support early diagnosis.”
